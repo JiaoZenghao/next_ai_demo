@@ -1,0 +1,15 @@
+pre-commit:
+  jobs:
+    - name: eslint staged source files
+      glob: "*.{js,jsx,ts,tsx}"
+      run: pnpm exec eslint {staged_files}
+
+pre-push:
+  parallel: true
+  jobs:
+    - name: lint
+      run: pnpm lint
+    - name: typecheck
+      run: pnpm typecheck
+    - name: unit tests with coverage
+      run: pnpm test:coverage
