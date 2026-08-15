@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { NextRequest } from "next/server";
 
 import {
   DEMO_SESSION_COOKIE,
@@ -6,6 +7,7 @@ import {
   getAuthRedirect,
   validateCredentials,
 } from "./auth";
+import { proxy } from "../proxy";
 
 describe("validateCredentials", () => {
   it("accepts the exact demo credentials", () => {
@@ -54,5 +56,20 @@ describe("demo session constants", () => {
   it("uses stable non-empty cookie identifiers", () => {
     expect(DEMO_SESSION_COOKIE).toBe("ai_demo_session");
     expect(DEMO_SESSION_VALUE).toBe("authenticated");
+  });
+});
+
+describe("proxy", () => {
+  it("redirects an unauthenticated request to the login page", () => {
+    const response = proxy(new NextRequest("http://localhost/settings"));
+
+    expect(response.headers.get("location")).toBe("http://localhost/login");
+  });
+
+  it("allows an authenticated request through", () => {
+    const request = new NextRequest("http://localhost/settings");
+    request.cookies.set(DEMO_SESSION_COOKIE, DEMO_SESSION_VALUE);
+
+    expect(proxy(request).headers.get("x-middleware-next")).toBe("1");
   });
 });
