@@ -49,6 +49,7 @@ export function LoginForm({
                   type="text"
                   autoComplete="username"
                   aria-invalid={invalid}
+                  aria-describedby={invalid ? "login-error" : undefined}
                   required
                 />
               </Field>
@@ -60,10 +61,11 @@ export function LoginForm({
                   type="password"
                   autoComplete="current-password"
                   aria-invalid={invalid}
+                  aria-describedby={invalid ? "login-error" : undefined}
                   required
                 />
                 {state.error ? (
-                  <FieldDescription role="alert">
+                  <FieldDescription id="login-error" role="alert">
                     {state.error}
                   </FieldDescription>
                 ) : null}

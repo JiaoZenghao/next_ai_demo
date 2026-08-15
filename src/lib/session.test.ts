@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const cookieStore = {
   delete: vi.fn(),
@@ -17,7 +17,13 @@ describe("demo session", () => {
     vi.clearAllMocks();
   });
 
-  it("creates a secure server-side demo session cookie", async () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("creates a non-secure demo session cookie outside production", async () => {
+    vi.stubEnv("NODE_ENV", "test");
+
     await createDemoSession();
 
     expect(cookieStore.set).toHaveBeenCalledWith(
@@ -27,6 +33,24 @@ describe("demo session", () => {
         httpOnly: true,
         sameSite: "lax",
         secure: false,
+        path: "/",
+        maxAge: 24 * 60 * 60,
+      },
+    );
+  });
+
+  it("creates a secure demo session cookie in production", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+
+    await createDemoSession();
+
+    expect(cookieStore.set).toHaveBeenCalledWith(
+      DEMO_SESSION_COOKIE,
+      DEMO_SESSION_VALUE,
+      {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: true,
         path: "/",
         maxAge: 24 * 60 * 60,
       },
