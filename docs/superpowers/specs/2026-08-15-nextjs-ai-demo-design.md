@@ -6,7 +6,7 @@ Create a clean, modern Next.js project directly in the existing `ai_demo` direct
 
 ## Project Scope
 
-The initial result is an infrastructure-only starter. It includes the framework, styling, linting, UI-system configuration, version control, and project guidance for Codex. It does not include an AI SDK, database, authentication, business logic, sample UI components, or a test framework.
+The initial result is an infrastructure-only starter. It includes the framework, styling, linting, unit-test infrastructure, UI-system configuration, version control, and project guidance for Codex. It does not include an AI SDK, database, authentication, business logic, or sample UI components.
 
 ## Technology Stack
 
@@ -20,6 +20,7 @@ The initial result is an infrastructure-only starter. It includes the framework,
 - Lucide icons
 - ESLint
 - Lefthook 2.x
+- Vitest with V8 coverage
 - Turbopack
 - pnpm
 - Git
@@ -53,11 +54,25 @@ Use Lefthook as the Git hook manager. Install it as a pinned pnpm development de
 Store the shared configuration in `lefthook.yml`:
 
 - `pre-commit` runs ESLint only on staged JavaScript and TypeScript source files (`js`, `jsx`, `ts`, and `tsx`). Lefthook's staged-file filtering is sufficient, so `lint-staged` will not be installed.
-- `pre-push` runs the full-project ESLint check and `tsc --noEmit` in parallel.
+- `pre-push` runs the full-project ESLint check, `tsc --noEmit`, and the unit-test coverage suite in parallel.
 
 Add a `typecheck` package script for the TypeScript check. Keep the production build out of the pre-push hook to avoid making every push unnecessarily slow; Codex will still run it before declaring implementation work complete.
 
 Developers may bypass hooks only for an exceptional, explicitly acknowledged reason. Hooks are a local feedback mechanism rather than a security boundary, and future CI should repeat the required checks because local hooks can be bypassed.
+
+## Unit Testing
+
+Use Vitest in the Node environment for framework-independent logic. Install Vitest, `@vitest/coverage-v8`, and `vite-tsconfig-paths` as development dependencies. React Testing Library and jsdom are outside the initial scope; add them only when the first behaviorful React component requires unit-level DOM testing.
+
+Add these package scripts:
+
+- `test` starts Vitest in watch mode for local development.
+- `test:run` executes the suite once and permits the initial project to contain no test files.
+- `test:coverage` executes the suite once with V8 coverage, permits the initial empty logic set, and is used by the pre-push hook.
+
+Place substantial framework-independent logic in `src/lib/` and colocate tests as `*.test.ts`. Coverage will include non-test TypeScript files under `src/lib/`, exclude shadcn's generated `src/lib/utils.ts`, and enforce per-file minimums of 80% for statements, branches, functions, and lines. The initial empty logic set may pass with no tests; once a qualifying logic file is added, the coverage include rules make an untested file fail the gate.
+
+Tests are required for major logic, including validation, transformations, calculations, authorization decisions, branching business rules, and AI prompt or tool orchestration. Generated files, simple declarative configuration, and styling-only code do not require unit tests. Async Server Components should be covered by future end-to-end tests rather than forced into Vitest.
 
 ## Codex Agent Guidance
 
@@ -71,9 +86,10 @@ The appended guidance will require agents to:
 - prefer Server Components unless client behavior is necessary;
 - use the configured shadcn/ui Base UI foundation;
 - keep Lefthook checks passing and avoid bypassing hooks unless the reason is explicit;
+- add or update unit tests whenever major logic changes;
 - explain the need for new production dependencies;
 - keep secrets in uncommitted environment files; and
-- run lint and a production build before declaring implementation work complete.
+- run lint, type-checking, unit-test coverage, and a production build before declaring implementation work complete.
 
 Nested `AGENTS.md` files are unnecessary until a future subdirectory needs genuinely different instructions.
 
@@ -92,12 +108,13 @@ Setup is complete only when all of the following succeed:
 1. pnpm dependency installation completes.
 2. ESLint reports no errors.
 3. TypeScript checking with `tsc --noEmit` completes.
-4. A production Next.js build completes.
-5. Lefthook validates its configuration and both hook groups can execute successfully.
-6. The shadcn CLI recognizes the project configuration.
-7. Git status contains only the intended scaffold and configuration files before the initial project commit.
+4. The Vitest suite and configured per-file coverage thresholds pass.
+5. A production Next.js build completes.
+6. Lefthook validates its configuration and both hook groups can execute successfully.
+7. The shadcn CLI recognizes the project configuration.
+8. Git status contains only the intended scaffold and configuration files before the initial project commit.
 
-No unit or end-to-end test framework will be installed in this infrastructure-only starter. Feature work should introduce tests when it adds behavior worth testing.
+No end-to-end test framework will be installed in this infrastructure-only starter. Feature work should introduce browser-level tests when it adds user flows or async Server Components that unit tests cannot cover reliably.
 
 ## Explicit Non-Goals
 
@@ -108,4 +125,4 @@ No unit or end-to-end test framework will be installed in this infrastructure-on
 - CI/CD configuration
 - Sample shadcn components or demo screens
 - Custom branding or visual design
-- Unit, integration, or end-to-end test tooling
+- Integration or end-to-end test tooling
