@@ -6,7 +6,12 @@ export default defineConfig({
   },
   test: {
     environment: "node",
-    exclude: [...configDefaults.exclude, ".worktrees/**", "e2e/**"],
+    exclude: [
+      ...configDefaults.exclude,
+      ".pnpm-store/**",
+      ".worktrees/**",
+      "e2e/**",
+    ],
     setupFiles: ["./src/test/setup.ts"],
     passWithNoTests: true,
     coverage: {

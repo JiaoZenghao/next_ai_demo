@@ -8,6 +8,7 @@ const eslintConfig = defineConfig([
   // Override default ignores of eslint-config-next.
   globalIgnores([
     ".next/**",
+    ".pnpm-store/**",
     ".worktrees/**",
     "out/**",
     "build/**",
