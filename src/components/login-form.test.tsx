@@ -28,6 +28,12 @@ describe("LoginForm", () => {
 
     expect(screen.getByRole("textbox", { name: "Username" })).toBeRequired();
     expect(screen.getByLabelText("Password")).toBeRequired();
+    expect(
+      screen.getByRole("textbox", { name: "Username" }),
+    ).not.toHaveAttribute("aria-describedby");
+    expect(screen.getByLabelText("Password")).not.toHaveAttribute(
+      "aria-describedby",
+    );
     expect(screen.getByRole("button", { name: "Login" })).toBeEnabled();
     expect(
       screen.queryByText(/google|forgot password|sign up/i),
