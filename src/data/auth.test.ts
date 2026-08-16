@@ -23,7 +23,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 import { getDemoSession, verifySession } from "./auth";
-import { DEMO_SESSION_VALUE } from "@/lib/auth";
+import { DEMO_SESSION_COOKIE, DEMO_SESSION_VALUE } from "@/lib/auth";
 
 describe("demo authentication DAL", () => {
   beforeEach(() => {
@@ -36,6 +36,7 @@ describe("demo authentication DAL", () => {
     cookieGetMock.mockReturnValue({ value: DEMO_SESSION_VALUE });
 
     await expect(getDemoSession()).resolves.toEqual({ isAuthenticated: true });
+    expect(cookieGetMock).toHaveBeenCalledWith(DEMO_SESSION_COOKIE);
   });
 
   it.each([undefined, { value: "" }, { value: "forged" }])(

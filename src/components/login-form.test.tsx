@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const useActionStateMock = vi.hoisted(() => vi.fn());
@@ -38,6 +39,28 @@ describe("LoginForm", () => {
     expect(
       screen.queryByText(/google|forgot password|sign up/i),
     ).not.toBeInTheDocument();
+  });
+
+  it("submits the credentials entered by the user", async () => {
+    const user = userEvent.setup();
+    const formAction = vi.fn();
+    useActionStateMock.mockReturnValue([{ error: null }, formAction, false]);
+
+    render(<LoginForm />);
+
+    await user.type(
+      screen.getByRole("textbox", { name: "Username" }),
+      "admin",
+    );
+    await user.type(screen.getByLabelText("Password"), "admin123");
+    await user.click(screen.getByRole("button", { name: "Login" }));
+
+    await waitFor(() => expect(formAction).toHaveBeenCalledOnce());
+    const submittedData = formAction.mock.calls[0]?.[0];
+
+    expect(submittedData).toBeInstanceOf(FormData);
+    expect((submittedData as FormData).get("username")).toBe("admin");
+    expect((submittedData as FormData).get("password")).toBe("admin123");
   });
 
   it("describes both credential fields when login fails", () => {
