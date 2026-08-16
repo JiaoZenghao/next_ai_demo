@@ -1,15 +1,21 @@
-import { defineConfig } from "vitest/config";
-import tsconfigPaths from "vite-tsconfig-paths";
+import { configDefaults, defineConfig } from "vitest/config";
 
 export default defineConfig({
-  plugins: [tsconfigPaths()],
+  resolve: {
+    tsconfigPaths: true,
+  },
   test: {
     environment: "node",
+    exclude: [...configDefaults.exclude, ".worktrees/**", "e2e/**"],
+    setupFiles: ["./src/test/setup.ts"],
     passWithNoTests: true,
     coverage: {
       provider: "v8",
-      include: ["src/lib/**/*.{ts,tsx}"],
-      exclude: ["src/lib/utils.ts", "src/lib/**/*.test.{ts,tsx}"],
+      include: ["src/{lib,data}/**/*.{ts,tsx}"],
+      exclude: [
+        "src/lib/utils.ts",
+        "src/{lib,data}/**/*.test.{ts,tsx}",
+      ],
       thresholds: {
         perFile: true,
         statements: 80,
