@@ -1,4 +1,6 @@
-import { renderToStaticMarkup } from "react-dom/server";
+// @vitest-environment jsdom
+
+import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const useActionStateMock = vi.hoisted(() => vi.fn());
@@ -19,31 +21,48 @@ describe("LoginForm", () => {
     useActionStateMock.mockReset();
   });
 
-  it("associates both credential inputs with the login error", () => {
+  it("renders accessible required credential fields and an enabled login action", () => {
+    useActionStateMock.mockReturnValue([{ error: null }, vi.fn(), false]);
+
+    render(<LoginForm />);
+
+    expect(screen.getByRole("textbox", { name: "Username" })).toBeRequired();
+    expect(screen.getByLabelText("Password")).toBeRequired();
+    expect(screen.getByRole("button", { name: "Login" })).toBeEnabled();
+    expect(
+      screen.queryByText(/google|forgot password|sign up/i),
+    ).not.toBeInTheDocument();
+  });
+
+  it("describes both credential fields when login fails", () => {
     useActionStateMock.mockReturnValue([
       { error: "Invalid username or password." },
-      undefined,
+      vi.fn(),
       false,
     ]);
 
-    const markup = renderToStaticMarkup(<LoginForm />);
+    render(<LoginForm />);
 
-    expect(markup.match(/aria-describedby="login-error"/g)).toHaveLength(2);
-    expect(markup).toMatch(
-      /<p[^>]*id="login-error"[^>]*role="alert"[^>]*>Invalid username or password\.<\/p>/,
+    expect(screen.getByRole("textbox", { name: "Username" })).toHaveAttribute(
+      "aria-describedby",
+      "login-error",
+    );
+    expect(screen.getByLabelText("Password")).toHaveAttribute(
+      "aria-describedby",
+      "login-error",
+    );
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Invalid username or password.",
     );
   });
 
-  it("does not describe valid credential inputs with a login error", () => {
-    useActionStateMock.mockReturnValue([
-      { error: null },
-      undefined,
-      false,
-    ]);
+  it("disables the login action while the login request is pending", () => {
+    useActionStateMock.mockReturnValue([{ error: null }, vi.fn(), true]);
 
-    const markup = renderToStaticMarkup(<LoginForm />);
+    render(<LoginForm />);
 
-    expect(markup).not.toContain("aria-describedby");
-    expect(markup).not.toContain('id="login-error"');
+    expect(
+      screen.getByRole("button", { name: "Signing in..." }),
+    ).toBeDisabled();
   });
 });
