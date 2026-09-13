@@ -1,14 +1,27 @@
 "use client";
 
 import { CopilotKit, useCopilotAction, useCopilotReadable } from "@copilotkit/react-core";
-import { CopilotSidebar } from "@copilotkit/react-ui";
+import { CopilotSidebar, useChatContext } from "@copilotkit/react-ui";
 import { useCopilotKit } from "@copilotkit/react-core/v2";
 import type { ReactNode } from "react";
+import { MessageSquare, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 import { RevenueChart } from "./revenue-chart";
 import { revenueData, type RevenuePoint } from "@/data/revenue";
 
 type AssistantProps = { children: ReactNode; mode: "mock" | "live" };
+
+function AssistantLauncher() {
+  const { open, setOpen } = useChatContext();
+  if (open) return null;
+  return <Button onClick={() => setOpen(true)} aria-label="打开数据助手" className="fixed right-5 bottom-5 z-40 h-12 rounded-full bg-dashboard-indigo px-5 text-white shadow-lg hover:bg-dashboard-indigo/90"><MessageSquare className="size-4" />数据助手</Button>;
+}
+
+function AssistantHeader() {
+  const { labels, setOpen } = useChatContext();
+  return <div className="flex min-h-16 items-center justify-between border-b bg-card px-5 text-foreground"><div><p className="text-sm font-semibold">数据助手</p><p className="mt-1 text-xs text-muted-foreground">{labels.title}</p></div><Button variant="ghost" size="icon" aria-label="关闭数据助手" onClick={() => setOpen(false)}><X className="size-4" /></Button></div>;
+}
 
 function AssistantSidebar({ children, mode }: AssistantProps) {
   const { copilotkit } = useCopilotKit();
@@ -62,22 +75,24 @@ function AssistantSidebar({ children, mode }: AssistantProps) {
 
   return (
     <CopilotSidebar
-      defaultOpen
+      defaultOpen={false}
+      Button={AssistantLauncher}
+      Header={AssistantHeader}
       clickOutsideToClose={false}
       ErrorMessage={() => (
         <p role="alert" className="m-4 rounded-lg border p-4 text-sm text-muted-foreground">
           {mode === "mock" ? "演示连接暂时中断，请重试。" : "模型请求失败，请检查服务端模型配置、密钥和服务可用性。"}
         </p>
       )}
-      instructions="You are Lumina's Data Assistant. Answer in the user's language. Use only the provided dashboard mock data. State that the figures are mock data. Never invent trends, causes, database access or actions. The monthly revenue series and summary KPI are separate demo fixtures. When asked for a revenue chart, call showRevenueChart. For progressive or streaming chart requests call streamRevenueChart with the eight provided monthly points in order. Give concise, helpful answers with correctly formatted currency."
+      instructions="You are Lumina's Data Assistant. Answer in the user's language. Answer general questions using your knowledge and reasoning. For questions about this dashboard, ground all figures and trends in the provided dashboard context and identify its data source accurately. The current dashboard context contains mock data; using a live model does not make that data real. Never invent business figures, causes, database access or actions. If the context is insufficient, say what information is missing. The monthly revenue series and summary KPI are separate demo fixtures. When asked for a revenue chart, call showRevenueChart. For progressive or streaming chart requests call streamRevenueChart with the eight provided monthly points in order. Give concise, helpful answers with correctly formatted currency."
       suggestions={ready ? [
-        { title: mode === "mock" ? "▶ 收入趋势流式演示" : "分析收入趋势并生成图表", message: "请用 mock 数据演示流式回答，并逐月生成收入趋势图。" },
+        { title: mode === "mock" ? "▶ 收入趋势流式演示" : "分析收入趋势并生成图表", message: mode === "mock" ? "请用 mock 数据演示流式回答，并逐月生成收入趋势图。" : "请根据当前看板数据分析收入趋势，并生成收入趋势图。" },
       ] : []}
       labels={{
-        title: "Data Assistant",
+        title: mode === "mock" ? "演示问答 · 固定模拟回复" : "真实模型 · 基于当前看板",
         initial: mode === "mock"
-          ? "**收入趋势 · Mock 流式演示**\n\n点击下方按钮，观看文字逐段输出，以及 1–8 月收入数据逐点绘制成图。\n\n这是固定脚本和模拟数据，不调用模型，也不代表真实实时业务数据。发送任意问题均可重播。"
-          : "**Data Assistant · Live 模型**\n\n由服务端配置的模型实时回答，可分析收入趋势并生成图表。看板数据仍为 Mock 数据。\n\n聊天内容和看板上下文会发送给配置的模型服务。",
+          ? "点击下方示例，体验收入趋势分析与动态图表。演示问答使用固定回复，不调用模型。"
+          : "你好，可以向我询问当前看板的指标与趋势。当前看板使用示例数据；聊天内容与看板上下文会发送至配置的模型服务。",
         placeholder: "询问收入、趋势或关键指标…",
       }}
     >
@@ -88,7 +103,7 @@ function AssistantSidebar({ children, mode }: AssistantProps) {
 
 export function DataAssistant({ children, mode }: AssistantProps) {
   return (
-    <CopilotKit runtimeUrl={mode === "mock" ? "/api/copilotkit?demo=true" : "/api/copilotkit"} useSingleEndpoint showDevConsole={false} enableInspector={false}>
+    <CopilotKit key={mode} runtimeUrl={mode === "mock" ? "/api/copilotkit?demo=true" : "/api/copilotkit"} useSingleEndpoint showDevConsole={false} enableInspector={false}>
       <AssistantSidebar mode={mode}>{children}</AssistantSidebar>
     </CopilotKit>
   );

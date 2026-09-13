@@ -28,6 +28,13 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000). Unauthenticated requests to the home page redirect to `/login`.
 
+## Container and Kubernetes deployment
+
+See [Docker and Kubernetes deployment](docs/deployment.md) for the multi-stage
+image, Kustomize manifests, ConfigMap/Secret setup, probes and SSE ingress settings.
+The default deployment uses Mock mode and a ClusterIP Service, with no public Ingress.
+Replace demo authentication before exposing the application outside a trusted environment.
+
 ## Demo credentials
 
 - Username: `admin`
@@ -41,7 +48,7 @@ These credentials are public by design. Replace the entire demo authentication m
 | --- | --- |
 | `pnpm dev` | Start the Turbopack development server. |
 | `pnpm build` | Create the production build. |
-| `pnpm start` | Start the production server. |
+| `pnpm start` | Prepare static assets and start the standalone production server after building. |
 | `pnpm lint` | Run ESLint. |
 | `pnpm typecheck` | Run TypeScript without emitting files. |
 | `pnpm test` | Run Vitest in watch mode. |

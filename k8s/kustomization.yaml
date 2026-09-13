@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: ai-demo
+resources:
+  - namespace.yaml
+  - deployment.yaml
+  - service.yaml
+configMapGenerator:
+  - name: ai-demo-config
+    files:
+      - ai.yaml=config/ai.yaml
+# Content hashes make configuration changes roll out new Pods automatically.
+images:
+  - name: ai-demo
+    newName: ai-demo
+    newTag: local

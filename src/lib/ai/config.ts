@@ -13,6 +13,7 @@ const providerSchema = z.object({
   baseURL: endpoint,
   baseURLEnv: envName.optional(),
   apiKeyEnv: envName.optional(),
+  apiKey: z.string().optional(),
 }).strict();
 const modelSchema = z.object({
   provider: z.string().min(1),
@@ -49,7 +50,7 @@ export function resolveModelConfig(config: AIConfig, env: Record<string, string 
   if (!selected.capabilities.toolCalling) throw new AIConfigError("Data Assistant requires tool calling support.");
   const model = selected.model ?? env[selected.modelEnv!]?.trim();
   if (!model) throw new AIConfigError(`Missing model environment variable: ${selected.modelEnv}.`);
-  const apiKey = provider.apiKeyEnv ? env[provider.apiKeyEnv]?.trim() : undefined;
+  const apiKey = provider.apiKey ?? (provider.apiKeyEnv ? env[provider.apiKeyEnv]?.trim() : undefined);
   if (provider.apiKeyEnv && !apiKey) throw new AIConfigError(`Missing API key environment variable: ${provider.apiKeyEnv}.`);
   const baseURL = (provider.baseURLEnv && env[provider.baseURLEnv]?.trim()) || provider.baseURL;
   if (!endpoint.safeParse(baseURL).success) throw new AIConfigError("Invalid provider base URL.");

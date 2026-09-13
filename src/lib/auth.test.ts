@@ -27,6 +27,12 @@ describe("validateCredentials", () => {
 });
 
 describe("getAuthRedirect", () => {
+  it.each(["/api/health/live", "/api/health/ready"])("allows unauthenticated probe %s", pathname => {
+    expect(getAuthRedirect(pathname, false)).toBeNull();
+  });
+  it.each(["/api/health", "/api/health/ready/extra", "/api/health/live-admin", "/api/copilotkit"])("does not widen the public probe exemption to %s", pathname => {
+    expect(getAuthRedirect(pathname, false)).toBe("/login");
+  });
   it("allows an unauthenticated request for the login page", () => {
     expect(getAuthRedirect("/login", false)).toBeNull();
   });

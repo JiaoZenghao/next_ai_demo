@@ -1,0 +1,28 @@
+# OPTIONAL. Not included in kustomization.yaml.
+# Do not expose the demo authentication publicly. Add SSO/auth gateway first.
+# This example assumes an existing Traefik ingress controller and TLS Secret.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ai-demo
+  namespace: ai-demo
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - ai-demo.example.com
+      secretName: ai-demo-tls
+  rules:
+    - host: ai-demo.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ai-demo
+                port:
+                  name: http

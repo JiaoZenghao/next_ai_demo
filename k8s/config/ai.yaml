@@ -1,0 +1,29 @@
+# Cluster configuration, independent from local development config/ai.yaml.
+mode: mock
+providers:
+  local:
+    adapter: ollama
+    # Assumes an Ollama Service in this namespace; not deployed by these manifests.
+    baseURL: http://ollama.ai-demo.svc.cluster.local:11434/v1
+  aliyun:
+    adapter: openai-compatible
+    # Beijing; replace with the endpoint matching your API key's region.
+    baseURL: https://dashscope.aliyuncs.com/compatible-mode/v1
+    apiKeyEnv: DASHSCOPE_API_KEY
+models:
+  local-bi:
+    provider: local
+    modelEnv: OLLAMA_MODEL
+    capabilities:
+      toolCalling: true
+    timeoutMs: 60000
+    maxRetries: 0
+  qwen-bi:
+    provider: aliyun
+    model: qwen-plus
+    capabilities:
+      toolCalling: true
+    timeoutMs: 60000
+    maxRetries: 0
+assignments:
+  data-assistant: qwen-bi

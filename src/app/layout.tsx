@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { ChartNoAxesCombined } from "lucide-react";
 import localFont from "next/font/local";
 import { ThemeToggle } from "@/components/theme-toggle";
 import "@copilotkit/react-ui/styles.css";
@@ -33,16 +35,17 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="zh-CN"
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
         <script type={typeof window === "undefined" ? "text/javascript" : "text/plain"} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: `(function(){try{document.documentElement.classList.toggle('dark',localStorage.getItem('lumina-theme')==='dark')}catch(e){}})()` }} />
       </head>
-      <body className="min-h-full flex flex-col">
-        <header aria-label="Appearance" className="sticky top-0 z-40 flex h-14 shrink-0 items-center justify-end gap-3 border-b bg-background px-4 sm:px-6">
-          <span className="text-xs text-muted-foreground">Appearance</span>
+      {/* Extensions such as Grammarly inject body attributes before hydration. */}
+      <body suppressHydrationWarning className="min-h-full flex flex-col">
+        <header aria-label="应用工具栏" className="sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between gap-3 border-b bg-background px-4 sm:px-6">
+          <Link href="/" className="inline-flex items-center gap-2.5 font-semibold tracking-tight"><span className="flex size-8 items-center justify-center rounded-lg bg-dashboard-indigo text-white dark:text-background"><ChartNoAxesCombined className="size-4" /></span>Lumina<span className="ml-3 hidden border-l pl-3 text-xs font-normal tracking-normal text-muted-foreground sm:block">数据分析工作台</span></Link>
           <ThemeToggle />
         </header>
         {children}

@@ -15,6 +15,10 @@ export function getAuthRedirect(
   pathname: string,
   isAuthenticated: boolean,
 ): "/" | "/login" | null {
+  if (pathname === "/api/health/live" || pathname === "/api/health/ready") {
+    return null;
+  }
+
   if (pathname === "/login") {
     return isAuthenticated ? "/" : null;
   }

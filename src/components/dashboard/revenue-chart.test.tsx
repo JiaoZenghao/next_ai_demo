@@ -17,8 +17,8 @@ describe("RevenueChart", () => {
       /peak of seventy-eight thousand four hundred dollars in July/i,
     );
     expect(container.querySelector('[data-slot="chart"]')).toBeInTheDocument();
-    expect(screen.getByText("Revenue")).toBeInTheDocument();
-    expect(screen.getByText("Previous period")).toBeInTheDocument();
+    expect(screen.getByText("本期收入")).toBeInTheDocument();
+    expect(screen.getByText("上一期")).toBeInTheDocument();
     expect(screen.getByText("$78.4K")).toBeInTheDocument();
   });
 });

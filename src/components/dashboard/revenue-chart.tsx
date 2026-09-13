@@ -24,11 +24,11 @@ import {
 
 const chartConfig = {
   revenue: {
-    label: "Revenue",
+    label: "本期收入",
     color: "var(--dashboard-indigo)",
   },
   previousPeriod: {
-    label: "Previous period",
+    label: "上一期",
     color: "var(--muted-foreground)",
   },
 } satisfies ChartConfig;
