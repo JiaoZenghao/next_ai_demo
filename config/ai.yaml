@@ -1,0 +1,33 @@
+# Restart the application after changing configuration.
+# Mock never calls a model. Set mode: live to enable the selected provider.
+mode: mock
+
+providers:
+  local:
+    adapter: ollama
+    baseURL: http://127.0.0.1:11434/v1
+    baseURLEnv: OLLAMA_BASE_URL
+  aliyun:
+    adapter: openai-compatible
+    # Beijing endpoint; use the endpoint matching your API key's region.
+    baseURL: https://dashscope.aliyuncs.com/compatible-mode/v1
+    apiKeyEnv: DASHSCOPE_API_KEY
+
+models:
+  local-bi:
+    provider: local
+    modelEnv: OLLAMA_MODEL
+    capabilities:
+      toolCalling: true
+    timeoutMs: 60000
+    maxRetries: 0
+  qwen-bi:
+    provider: aliyun
+    model: qwen-plus
+    capabilities:
+      toolCalling: true
+    timeoutMs: 60000
+    maxRetries: 0
+
+assignments:
+  data-assistant: local-bi

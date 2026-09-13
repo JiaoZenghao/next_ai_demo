@@ -2,6 +2,53 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* Match the data assistant to Lumina's dashboard theme. */
+:root {
+  --copilot-kit-primary-color: var(--dashboard-indigo);
+  --copilot-kit-background-color: var(--card);
+  --copilot-kit-secondary-color: var(--muted);
+  --copilot-kit-secondary-contrast-color: var(--foreground);
+  --copilot-kit-contrast-color: white;
+  --copilot-kit-muted-color: var(--muted-foreground);
+  --copilot-kit-separator-color: var(--border);
+}
+
+.copilotKitSidebar .copilotKitWindow {
+  top: 3.5rem;
+  height: calc(100dvh - 3.5rem);
+  min-height: 0;
+  border-left: 1px solid var(--border);
+  font-family: var(--font-geist-sans), sans-serif;
+}
+
+.copilotKitSidebar .copilotKitHeader {
+  min-height: 76px;
+  background: var(--dashboard-sidebar);
+  color: var(--dashboard-sidebar-foreground);
+}
+
+.copilotKitSidebar .copilotKitInput {
+  border-radius: 16px;
+  border-color: var(--border);
+}
+
+/* CopilotKit sets mobile viewport height/top inline for the virtual keyboard.
+   Reserve toolbar space inside that window instead of overriding its geometry. */
+@media (max-width: 639px) {
+  .copilotKitSidebar .copilotKitWindow {
+    top: 0;
+    height: 100dvh;
+    padding-top: 3.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .copilotKitSidebarContentWrapper,
+  .copilotKitSidebar .copilotKitWindow {
+    transition: none;
+  }
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -23,6 +70,17 @@
   --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
+  --color-dashboard-canvas: var(--dashboard-canvas);
+  --color-dashboard-sidebar: var(--dashboard-sidebar);
+  --color-dashboard-sidebar-foreground: var(--dashboard-sidebar-foreground);
+  --color-dashboard-sidebar-active: var(--dashboard-sidebar-active);
+  --color-dashboard-indigo: var(--dashboard-indigo);
+  --color-dashboard-indigo-soft: var(--dashboard-indigo-soft);
+  --color-dashboard-blue-soft: var(--dashboard-blue-soft);
+  --color-dashboard-teal: var(--dashboard-teal);
+  --color-dashboard-teal-soft: var(--dashboard-teal-soft);
+  --color-dashboard-ink: var(--dashboard-ink);
+  --color-dashboard-muted: var(--dashboard-muted);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -72,6 +130,17 @@
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
+  --dashboard-canvas: oklch(0.977 0.006 255);
+  --dashboard-sidebar: oklch(0.205 0.065 257);
+  --dashboard-sidebar-foreground: oklch(0.962 0.01 255);
+  --dashboard-sidebar-active: oklch(0.38 0.12 261);
+  --dashboard-indigo: oklch(0.49 0.225 277);
+  --dashboard-indigo-soft: oklch(0.945 0.04 280);
+  --dashboard-blue-soft: oklch(0.95 0.035 245);
+  --dashboard-teal: oklch(0.47 0.12 174);
+  --dashboard-teal-soft: oklch(0.95 0.035 177);
+  --dashboard-ink: oklch(0.245 0.045 258);
+  --dashboard-muted: oklch(0.49 0.035 258);
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
@@ -83,7 +152,24 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
+.dashboard-theme {
+  --foreground: var(--dashboard-ink);
+  --card-foreground: var(--dashboard-ink);
+  --muted-foreground: var(--dashboard-muted);
+}
+
 .dark {
+  color-scheme: dark;
+  --dashboard-canvas: oklch(0.17 0.018 258);
+  --dashboard-sidebar: oklch(0.145 0.028 257);
+  --dashboard-sidebar-active: oklch(0.32 0.09 261);
+  --dashboard-indigo: oklch(0.73 0.16 280);
+  --dashboard-indigo-soft: oklch(0.28 0.065 280);
+  --dashboard-blue-soft: oklch(0.28 0.05 245);
+  --dashboard-teal: oklch(0.76 0.13 174);
+  --dashboard-teal-soft: oklch(0.28 0.045 177);
+  --dashboard-ink: oklch(0.95 0.012 258);
+  --dashboard-muted: oklch(0.72 0.025 258);
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -118,6 +204,7 @@
 }
 
 @layer base {
+  html { color-scheme: light; }
   * {
     @apply border-border outline-ring/50;
   }
